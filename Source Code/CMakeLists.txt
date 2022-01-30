@@ -1,0 +1,44 @@
+﻿cmake_minimum_required(VERSION 3.14)
+
+project(CSF4Tri_robust LANGUAGES CXX)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(CMAKE_AUTOUIC ON)# 设置自动生成ui.h文件, AUTOUIC打开可以省去QT5_WRAP_UI命令
+set(CMAKE_AUTOMOC ON)# 设置自动生成moc文件,AUTOMOC打开可以省去QT5_WRAP_CPP命令
+set(CMAKE_AUTORCC ON)# 将大文件的资源文件转为二进制rcc
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+file(GLOB ALLHEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+file(GLOB ALLCPP ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+
+file(GLOB YUTILSHEADERS ${CMAKE_CURRENT_SOURCE_DIR}/yutils/*.h)
+file(GLOB YUTILSCPP ${CMAKE_CURRENT_SOURCE_DIR}/yutils/*.cpp)
+
+file(GLOB CSFHEADERS ${CMAKE_CURRENT_SOURCE_DIR}/CSF/*.h)
+file(GLOB CSFCPP ${CMAKE_CURRENT_SOURCE_DIR}/CSF/*.cpp)
+
+find_package(Qt5Core)
+
+find_package(OpenMP REQUIRED)
+if(OPENMP_FOUND)
+message("OPENMP FOUND")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif()
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Fast-BVH)
+
+add_executable(CSF4Tri_robust
+  main.cpp
+  ${ALLHEADERS}
+  ${ALLCPP}
+  ${YUTILSHEADERS}
+  ${YUTILSCPP}
+  ${CSFHEADERS}
+  ${CSFCPP}
+)
+target_link_libraries(CSF4Tri_robust PUBLIC Qt5::Core PRIVATE FastBVH)

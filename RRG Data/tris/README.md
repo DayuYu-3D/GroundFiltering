@@ -1,0 +1,1 @@
+## Notice: the 6-part1.txt and 6-part2.txt files in points directory need to be combined into a single file with a name of "6.txt",due to A single file in GITHUB cannot exceed 100m.
