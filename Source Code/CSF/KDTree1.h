@@ -1,17 +1,6 @@
 ﻿#ifndef KDTREE1
 #define KDTREE1
 
-/*
- * file: KDTree.hpp
- * author: J. Frederico Carvalho
- *
- * This is an adaptation of the KD-tree implementation in rosetta code
- *  https://rosettacode.org/wiki/K-d_tree
- * It is a reimplementation of the C code using C++.
- * It also includes a few more queries than the original
- *
- */
-
 #include <algorithm>
 #include <functional>
 #include <memory>

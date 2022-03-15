@@ -1,10 +1,4 @@
-﻿/********************************************
- * Class: TriangleRead
- * Author: Dayu
- * Site: WHU
- * Date: 20201207
-********************************************/
-#ifndef TRIANGLEREADER_H
+﻿#ifndef TRIANGLEREADER_H
 #define TRIANGLEREADER_H
 
 #include <string>

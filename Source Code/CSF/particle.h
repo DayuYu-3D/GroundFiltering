@@ -1,12 +1,4 @@
-﻿/********************************************
- * Class: Particle
- * Description: xxx
- * Notice: xxx
- * Author: 于大宇
- * Site: WHU
- * Date: 20201207
-********************************************/
-#ifndef PARTICLE_H
+﻿#ifndef PARTICLE_H
 #define PARTICLE_H
 
 #include <vector>

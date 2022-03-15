@@ -1,12 +1,4 @@
-﻿/********************************************
- * Class: ParticalAltitudeFinder
- * Description: xxx
- * Notice: xxx
- * Author: 于大宇
- * Site: WHU
- * Date: 20210817
-********************************************/
-#ifndef PARTICALALTITUDEFINDER_H
+﻿#ifndef PARTICALALTITUDEFINDER_H
 #define PARTICALALTITUDEFINDER_H
 
 #include <map>

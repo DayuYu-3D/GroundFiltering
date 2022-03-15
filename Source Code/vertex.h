@@ -1,10 +1,4 @@
-﻿/********************************************
- * Class: Vertex
- * Author: Dayu
- * Site: WHU
- * Date: 20201207
-********************************************/
-#ifndef VERTEX_H
+﻿#ifndef VERTEX_H
 #define VERTEX_H
 
 #include "vec3d.h"

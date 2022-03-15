@@ -1,12 +1,4 @@
-﻿/********************************************
- * Class: CSF4Tri
- * Description: 用于三角面片的CSF过滤器
- * Notice: xxx
- * Author: 于大宇
- * Site: WHU
- * Date: 20201207
-********************************************/
-#ifndef CSF4TRI_H
+﻿#ifndef CSF4TRI_H
 #define CSF4TRI_H
 
 #include <vector>
