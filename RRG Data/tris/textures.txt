@@ -1,6 +1,0 @@
-U:/obliqueMesh/Product16/tris/texture/Tile_10_0.jpg
-U:/obliqueMesh/Product16/tris/texture/Tile_12_0.jpg
-U:/obliqueMesh/Product16/tris/texture/Tile_13_0.jpg
-U:/obliqueMesh/Product16/tris/texture/Tile_14_0.jpg
-U:/obliqueMesh/Product16/tris/texture/Tile_15_0.jpg
-U:/obliqueMesh/Product16/tris/texture/Tile_16_0.jpg
