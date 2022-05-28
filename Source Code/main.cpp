@@ -20,9 +20,6 @@ int main(int argc, char *argv[])
     a.parse_check(argc, argv);
     std::string fp_cfg = a.get<std::string>("cfgPath");/// 获取输入的参数值
 
-    //获取开始时间
-    auto startT = std::chrono::system_clock::now();
-
     //step0: 参数解析
     Cfg cfg;
 
@@ -53,12 +50,15 @@ int main(int argc, char *argv[])
     std::vector<Triangle> vTriangle; ///大量内存占用
     std::map<size_t, std::vector<Vertex>> mvVertex; ///大量内存占用
     TriangleReader triReader(triangle_path);
-    triReader.setPointFileFlag(false);
+    triReader.setPointFileFlag(true);
     if(!triReader.readTriangleData(vTriangle, mvVertex))
     {
         std::cout << "read data failed, quit!" << std::endl;
         return -1;
     }
+
+    //获取开始时间
+    auto startT = std::chrono::system_clock::now();
 
     //step2: 初始化CSF4Tri
     Params ps;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     //获取结束时间
     auto entT = std::chrono::system_clock::now();
     double ut = std::chrono::duration_cast<std::chrono::milliseconds>(entT - startT).count();
-    std::cout << "Total use time: " << (double)ut / 1000 << "s" << std::endl;
+    std::cout << "* Total use time: " << (double)ut / 1000 << "s" << std::endl;
 
     //step4: 保存结果
     std::string strFP = yUtils::getNameLessExtension(triangle_path);

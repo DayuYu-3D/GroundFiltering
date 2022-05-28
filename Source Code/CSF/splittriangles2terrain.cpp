@@ -24,6 +24,8 @@ void SplitTriangles2Terrain::splitTerrain(Cloth &cloth,
 
     //第一种方法:根据三角形顶点分离,
     int nTris = static_cast<int>(pvTriangle->size());
+    std::vector<bool> vGroundOrOG(nTris);
+#pragma omp parallel for
     for(int iTri = 0; iTri < nTris; ++iTri)
     {
         auto gemIx = pvTriangle->at(iTri)._geomIndex;
@@ -60,13 +62,15 @@ void SplitTriangles2Terrain::splitTerrain(Cloth &cloth,
 
             //如果三个顶有一个点是非地面点,则认为该三角形为非地面三角形
             if (fabs(height_var) > _classThreshold) {
-                offGroundIndexes.push_back((unsigned int)iTri);
+                vGroundOrOG[iTri] = false;
+//                offGroundIndexes.push_back((unsigned int)iTri);
                 break;
             } else {
                 if(j == 2)
                 {
                     //如果三个顶点都是地面点,则认为该三角形为地面三角形
-                    groundIndexes.push_back((unsigned int)iTri);
+                    vGroundOrOG[iTri] = true;
+//                    groundIndexes.push_back((unsigned int)iTri);
                 }
             }
 //            //如果有一个顶点是地面点,则认为该三角形为地面三角形
@@ -80,6 +84,17 @@ void SplitTriangles2Terrain::splitTerrain(Cloth &cloth,
 //                    offGroundIndexes.push_back((unsigned int)iTri);
 //                }
 //            }
+        }
+    }
+    for(size_t triIx=0; triIx<vGroundOrOG.size();++triIx)
+    {
+        bool b = vGroundOrOG[triIx];
+        if(b)
+        {
+            groundIndexes.emplace_back(triIx);
+        }else
+        {
+            offGroundIndexes.emplace_back(triIx);
         }
     }
 }

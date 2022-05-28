@@ -1,4 +1,10 @@
-﻿#ifndef VEC3D_H
+﻿/********************************************
+ * Class: Vec3d
+ * Author: Dayu
+ * Site: WHU
+ * Date: 20201207
+********************************************/
+#ifndef VEC3D_H
 #define VEC3D_H
 
 #include <math.h>

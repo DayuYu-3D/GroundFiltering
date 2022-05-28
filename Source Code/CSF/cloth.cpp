@@ -34,6 +34,7 @@ Cloth::Cloth(const Vec3d &originPos,
     double time_step2 = _timeStep * _timeStep;
 
     // creating particles in a grid of particles from (0,0,0) to (width,-height,0)
+//#pragma omp parallel for
     for (int i = 0; i < _numLength_particles; ++i) {
         for (int j = 0; j < _numWdith_particles; ++j) {
             Vec3d pos(_originPos[0] + j * _stepX,
@@ -50,6 +51,7 @@ Cloth::Cloth(const Vec3d &originPos,
 
     // Connecting immediate neighbor particles with constraints
     // (distance 1 and sqrt(2) in the grid)
+//#pragma omp parallel for
     for (int i = 0; i < _numLength_particles; ++i) {
         for (int j = 0; j < _numWdith_particles; ++j) {
 
@@ -69,6 +71,7 @@ Cloth::Cloth(const Vec3d &originPos,
     }
 
     // Connecting secondary neighbors with constraints (distance 2 and sqrt(4) in the grid)
+//#pragma omp parallel for
     for (int i = 0; i < _numLength_particles; ++i) {
         for (int j = 0; j < _numWdith_particles; ++j) {
 
@@ -96,13 +99,14 @@ double Cloth::timeStep()
         _vParticles[i].timeStep(); //更新外力
     }
 
-//    #pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < _numLength_particles; ++i) {//更新内部力
         for (int j = 0; j < _numWdith_particles; ++j) {
             getParticle(i, j)->satisfyConstraintSelf(_constraintIterations);
         }
     }
 
+    //改过程并行不值得
     double maxDiff = 0;
     for (int i = 0; i < particleCount; ++i) {
         if (_vParticles[i].isMovable()) {

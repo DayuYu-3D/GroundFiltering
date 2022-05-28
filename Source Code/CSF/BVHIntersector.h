@@ -1,7 +1,9 @@
-#ifndef BVHINTERSECTOR_H
+﻿#ifndef BVHINTERSECTOR_H
 #define BVHINTERSECTOR_H
 
+#include <fstream>
 #include <map>
+#include <iostream>
 
 #include <FastBVH.h> //path: Fast-BVH\include
 
@@ -104,33 +106,35 @@ class FaceBoxConverter final {
 template<typename Float>
 class FaceIntersector final {
   //! Contains the object file vertices;
-  const std::map<size_t, std::vector<Vertex>>& _mvVertex;
+  const std::map<size_t, std::vector<Vertex>>* _mvVertex;
 
   //! The faces.
-  const std::vector<Triangle>& _faces;
+  const std::vector<Triangle>* _faces;
 
  public:
   //! \brief Constructs a new instance of a face intersector.
   //! Normally, at this point, we'd pre-compute some more acceleration data,
   //! but we're going to keep this example short and sweet.
-  FaceIntersector(const std::map<size_t, std::vector<Vertex>>& vvVertex, const std::vector<Triangle>& faces)
+  FaceIntersector(const std::map<size_t, std::vector<Vertex>>* vvVertex, const std::vector<Triangle>* faces)
       : _mvVertex(vvVertex), _faces(faces) {}
 
   FastBVH::Intersection<Float, uint32_t> operator()(uint32_t face_index, const FastBVH::Ray<Float>& ray) const
-      noexcept {
-    const auto& face = _faces[face_index];
+      noexcept
+  {
+//    std::cout<<_faces.size()<<std::endl;
+    const auto& face = _faces->at(face_index);
 
-    FastBVH::Vector3<Float> v0 = {static_cast<Float>(_mvVertex.at(face._geomIndex).at(face._vertexIndexs[0])._coor[0]),
-                                  static_cast<Float>(_mvVertex.at(face._geomIndex).at(face._vertexIndexs[0])._coor[1]),
-                                  static_cast<Float>(_mvVertex.at(face._geomIndex).at(face._vertexIndexs[0])._coor[2])};
+    FastBVH::Vector3<Float> v0 = {static_cast<Float>(_mvVertex->at(face._geomIndex).at(face._vertexIndexs[0])._coor[0]),
+                                  static_cast<Float>(_mvVertex->at(face._geomIndex).at(face._vertexIndexs[0])._coor[1]),
+                                  static_cast<Float>(_mvVertex->at(face._geomIndex).at(face._vertexIndexs[0])._coor[2])};
 
-    FastBVH::Vector3<Float> v1 = {static_cast<Float>(_mvVertex.at(face._geomIndex).at(face._vertexIndexs[1])._coor[0]),
-                                  static_cast<Float>(_mvVertex.at(face._geomIndex).at(face._vertexIndexs[1])._coor[1]),
-                                  static_cast<Float>(_mvVertex.at(face._geomIndex).at(face._vertexIndexs[1])._coor[2])};
+    FastBVH::Vector3<Float> v1 = {static_cast<Float>(_mvVertex->at(face._geomIndex).at(face._vertexIndexs[1])._coor[0]),
+                                  static_cast<Float>(_mvVertex->at(face._geomIndex).at(face._vertexIndexs[1])._coor[1]),
+                                  static_cast<Float>(_mvVertex->at(face._geomIndex).at(face._vertexIndexs[1])._coor[2])};
 
-    FastBVH::Vector3<Float> v2 = {static_cast<Float>(_mvVertex.at(face._geomIndex).at(face._vertexIndexs[2])._coor[0]),
-                                  static_cast<Float>(_mvVertex.at(face._geomIndex).at(face._vertexIndexs[2])._coor[1]),
-                                  static_cast<Float>(_mvVertex.at(face._geomIndex).at(face._vertexIndexs[2])._coor[2])};
+    FastBVH::Vector3<Float> v2 = {static_cast<Float>(_mvVertex->at(face._geomIndex).at(face._vertexIndexs[2])._coor[0]),
+                                  static_cast<Float>(_mvVertex->at(face._geomIndex).at(face._vertexIndexs[2])._coor[1]),
+                                  static_cast<Float>(_mvVertex->at(face._geomIndex).at(face._vertexIndexs[2])._coor[2])};
 
     // Basic Möller and Trumbore algorithm
 

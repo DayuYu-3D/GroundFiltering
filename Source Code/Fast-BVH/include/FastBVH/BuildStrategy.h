@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <FastBVH/BVH.h>
 #include <FastBVH/Config.h>

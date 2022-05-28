@@ -87,34 +87,33 @@ ParticalAltitudeFinder::~ParticalAltitudeFinder()
 void ParticalAltitudeFinder::findIntersectionHeight()
 {
     //1. 循环所有顶点,将其分配到cloth的粒子网格内
-    auto startT = std::chrono::system_clock::now();///获取当前时间
     this->findCollsionHeight_bvh();
-    auto afterT = std::chrono::system_clock::now();///获取结束时间
-    std::cout << "## Find couple triangle use time: " <<
-              std::chrono::duration_cast<std::chrono::milliseconds>(afterT - startT).count() << "ms" << std::endl;
 
     //4.查看是否还有空高程,若有则寻找最近粒子点的高程
     auto& heightVal = _cloth.getHeightvals();
-    int numNullPt = 0;
-    for(size_t i=0; i<heightVal.size(); ++i) {
+   // int numNullPt = 0;
+
+#pragma omp parallel for
+    for(int i=0; i<heightVal.size(); ++i) {
         if(heightVal[i] == MIN_INF) {
-            numNullPt += 1;
+            //numNullPt += 1;
             auto* pt = _cloth.getParticle1d(i);
             heightVal[i] = findHeightValByScanline(pt, _cloth);//为空值搜索高程值
         }
     }
-    int numNullPt1 = 0;
-    for(size_t i=0; i<heightVal.size(); ++i) {
-        if(heightVal[i] == MIN_INF) {
-            numNullPt1 += 1;
-        }
-    }
-    std::cout << "## Total num of partical:" << _cloth.getSize() <<"; Number of particals not find couple tirangle: "
-              << numNullPt <<"; After find neighbor: "<<numNullPt1<<std::endl;
+
+//    int numNullPt1 = 0;
+//    for(size_t i=0; i<heightVal.size(); ++i) {
+//        if(heightVal[i] == MIN_INF) {
+//            numNullPt1 += 1;
+//        }
+//    }
+//    std::cout << "## Total num of partical:" << _cloth.getSize() <<"; Number of particals not find couple tirangle: "
+//              << numNullPt <<"; After find neighbor: "<<numNullPt1<<std::endl;
 
     this->saveParticlesAndHeight();
 
-    //进行渐进地形异常高程值检测及恢复
+    //异常高程值检测及恢复
     if(_cloth._bcorrectAbnomal)
     {
         std::cout<<"no abnormal particles correction"<<std::endl;
@@ -217,11 +216,12 @@ void ParticalAltitudeFinder::findCollsionHeight_nearstVertex()
 
 void ParticalAltitudeFinder::findCollsionHeight_bvh()
 {
-    std::vector<std::uint32_t> face_indices;
+//    std::vector<std::uint32_t> face_indices;
+    _face_indices.clear();
     std::size_t nFaces = _pvTriangle->size();
-    face_indices.resize(nFaces);
+    _face_indices.resize(nFaces);
     for (std::size_t i = 0; i < nFaces; ++i) {
-      face_indices[i] = std::uint32_t(i);
+      _face_indices[i] = std::uint32_t(i);
     }
 
     //构建BVH树，速度有点慢
@@ -231,23 +231,25 @@ void ParticalAltitudeFinder::findCollsionHeight_bvh()
         _pBVH = nullptr;
     }
     auto startT = std::chrono::system_clock::now();///获取当前时间
-    std::printf("## Building BVH\n");
+    std::cout << "## Building BVH"<<std::endl;
     FaceBoxConverter<float> box_converter(*_pmvVertex, *_pvTriangle);
     FastBVH::BuildStrategy<float, 1> build_strategy;
-    _pBVH = build_strategy(face_indices, box_converter);
+    _pBVH = build_strategy(_face_indices, box_converter);
     auto afterT = std::chrono::system_clock::now();///获取结束时间
     std::cout << "## Build done, consumed time: " <<
               std::chrono::duration_cast<std::chrono::milliseconds>(afterT - startT).count() << "ms" << std::endl;
 
-    FaceIntersector<float> intersector(*_pmvVertex, *_pvTriangle); //相交判断
+    FaceIntersector<float> intersector(_pmvVertex, _pvTriangle); //相交判断
 
     _pTraverser = new FastBVH::Traverser<float, uint32_t, decltype(intersector)> (*_pBVH, intersector);
 
     //遍历所有粒子，获取交点
+    startT = std::chrono::system_clock::now();///获取当前时间
     std::vector<double> &heightVal = _cloth.getHeightvals();
     heightVal.clear();
     heightVal.resize(_cloth.getSize());
     int nParticles = _cloth.getSize();
+#pragma omp parallel for
     for(int i = 0; i<nParticles; ++i)
     {
         Particle* pt = _cloth.getParticle1d(i);
@@ -277,6 +279,9 @@ void ParticalAltitudeFinder::findCollsionHeight_bvh()
             heightVal[i] = MIN_INF;
         }
     }
+    afterT = std::chrono::system_clock::now();///获取结束时间
+    std::cout << "## Find couple triangle use time: " <<
+              std::chrono::duration_cast<std::chrono::milliseconds>(afterT - startT).count() << "ms" << std::endl;
 }
 
 double ParticalAltitudeFinder::findHeightValByNeighbor(Particle *p)
@@ -376,7 +381,6 @@ void ParticalAltitudeFinder::findAbnormalParticles()
 
     double threshold = _cloth._stepY * tan(_cloth._angle2 * std::PI/180.0f);
     double threshold_down = threshold; //下降阈值
-    std::cout<<threshold<<std::endl;
     double threshold2 = threshold; //假异常前后的梯度变化阈值，单位米,
     auto& heightVal = _cloth.getHeightvals();
 
@@ -682,39 +686,8 @@ void ParticalAltitudeFinder::findAbnormalParticles()
 
    //方案2：bvh求交点，取接近有效值的那个交点
     {
-        //TODO：有问题，若不重建这个,則traverse时会出bug，很神奇，目前跟踪不进去bug，只是换了个函数就不行？
-        //淦
-        //构建BVH树，速度有点慢，是
-        std::vector<std::uint32_t> face_indices;
-        std::size_t nFaces = _pvTriangle->size();
-        face_indices.resize(nFaces);
-        for (std::size_t i = 0; i < nFaces; ++i) {
-          face_indices[i] = std::uint32_t(i);
-        }
-        if(_pBVH)
-        {
-            delete _pBVH;
-            _pBVH = nullptr;
-        }
-        if(_pTraverser)
-        {
-            delete _pTraverser;
-            _pTraverser = nullptr;
-        }
-        auto startT = std::chrono::system_clock::now();///获取当前时间
-        std::printf("## Building BVH\n");
-        FaceBoxConverter<float> box_converter(*_pmvVertex, *_pvTriangle);
-        FastBVH::BuildStrategy<float, 1> build_strategy;
-        _pBVH = build_strategy(face_indices, box_converter);
-        auto afterT = std::chrono::system_clock::now();///获取结束时间
-        std::cout << "## Build done, consumed time: " <<
-                  std::chrono::duration_cast<std::chrono::milliseconds>(afterT - startT).count() << "ms" << std::endl;
 
-
-        FaceIntersector<float> intersector(*_pmvVertex, *_pvTriangle); //相交判断
-        _pTraverser = new FastBVH::Traverser<float, uint32_t, decltype(intersector)>(*_pBVH, intersector);
         //获取每个异常粒子的所有交点
-        _pTraverser->setTraverserFlags(FastBVH::TraverserFlags::AllOcclusion);
         std::vector<FastBVH::Intersection<float, std::uint32_t>> vIntersection;
         auto iter = mAbnormalParticles.begin();
         std::cout<< mAbnormalParticles.size()<<std::endl;
@@ -734,7 +707,7 @@ void ParticalAltitudeFinder::findAbnormalParticles()
             FastBVH::Vector3<float> d; //射线的方向
             d.x=0;d.y=0;d.z=-1; //竖直向下
             vIntersection.clear();
-            _pTraverser->traverse(FastBVH::Ray<float>{o,d}, vIntersection); //若不重新构建则这句话出问题
+            _pTraverser->traverse(FastBVH::Ray<float>{o,d}, vIntersection); //
             if(vIntersection.size()>1)
             {
                 float minZ = MAX_INF;

@@ -1,4 +1,12 @@
-﻿#ifndef PARTICALALTITUDEFINDER_H
+﻿/********************************************
+ * Class: ParticalAltitudeFinder
+ * Description: xxx
+ * Notice: xxx
+ * Author: 于大宇
+ * Site: WHU
+ * Date: 20210817
+********************************************/
+#ifndef PARTICALALTITUDEFINDER_H
 #define PARTICALALTITUDEFINDER_H
 
 #include <map>
@@ -64,6 +72,7 @@ private:
     const std::vector<Triangle> *_pvTriangle;
     const std::map<size_t, std::vector<Vertex>> *_pmvVertex;
 
+    std::vector<std::uint32_t> _face_indices;
     FastBVH::BVH<float, std::uint32_t>* _pBVH; //大内存占用
     FastBVH::Traverser<float, uint32_t, FaceIntersector<float>>* _pTraverser;
 

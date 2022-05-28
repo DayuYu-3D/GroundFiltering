@@ -1,4 +1,12 @@
-﻿#ifndef TRIANGLE_H
+﻿/********************************************
+ * Class: Triangle
+ * Description:xxx
+ * Notice: xxx
+ * Author: 于大宇
+ * Site: WHU
+ * Date: 20201207
+********************************************/
+#ifndef TRIANGLE_H
 #define TRIANGLE_H
 
 /**

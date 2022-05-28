@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <FastBVH/BVH.h>
 
@@ -29,7 +29,7 @@ class Traverser final {
  public:
   //! Constructs a new BVH traverser.
   //! \param bvh_ The BVH to be traversed.
-  constexpr Traverser(const BVH<Float, Primitive>& bvh_, const Intersector& intersector_) noexcept
+  constexpr Traverser(const BVH<Float, Primitive>& bvh_, Intersector intersector_) noexcept
       : bvh(bvh_), intersector(intersector_)
   {
       this->tFlags = TraverserFlags::NearestOcclusion;

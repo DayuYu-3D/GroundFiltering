@@ -1,4 +1,10 @@
-﻿#ifndef TRIANGLEREADER_H
+﻿/********************************************
+ * Class: TriangleRead
+ * Author: Dayu
+ * Site: WHU
+ * Date: 20201207
+********************************************/
+#ifndef TRIANGLEREADER_H
 #define TRIANGLEREADER_H
 
 #include <string>
@@ -30,6 +36,10 @@ public:
                             const std::vector<unsigned int> &vTriIndex,
                             std::string triP) const;
 
+    /**
+     * @brief setPointFileFlag
+     * @param b1PointFiel 是否是一个顶点文件
+     */
     void setPointFileFlag(bool b1PointFiel);
 private:
     /**

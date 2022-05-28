@@ -1,4 +1,12 @@
-﻿#ifndef CLOTH_H
+﻿/********************************************
+ * Class: Cloth
+ * Description:xxx
+ * Notice: xxx
+ * Author: 于大宇
+ * Site: WHU
+ * Date: 20201207
+********************************************/
+#ifndef CLOTH_H
 #define CLOTH_H
 
 #include <vector>
